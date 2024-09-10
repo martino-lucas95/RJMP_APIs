@@ -1,0 +1,44 @@
+syntax = "proto3";
+
+package andisbank;
+
+service InvestmentService {
+  rpc GetInvestmentsByAccount (GetInvestmentsByAccountRequest) returns (GetInvestmentsByAccountResponse);
+  rpc GetInvestments (GetInvestmentsRequest) returns (GetInvestmentsResponse);
+  rpc Invest (InvestRequest) returns (InvestResponse);
+}
+
+// Mensajes para el servicio
+message GetInvestmentsByAccountRequest {
+  string account_id = 1;
+}
+
+message GetInvestmentsByAccountResponse {
+  string account_id = 1;
+  repeated Investment investments = 2;
+}
+
+message GetInvestmentsRequest {}
+
+message GetInvestmentsResponse {
+  repeated Investment possible_investments = 1;
+}
+
+message InvestRequest {
+  string account_id = 1;
+  string investment_id = 2;
+  double amount = 3;
+}
+
+message InvestResponse {
+  string message = 1;
+  Investment investment = 2;
+}
+
+message Investment {
+  string id = 1;
+  string name = 2;
+  double amount = 3;
+}
+
+
