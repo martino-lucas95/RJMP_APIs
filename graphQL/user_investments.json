@@ -1,0 +1,31 @@
+{
+    "123": [
+        {
+            "id": 1,
+            "name": "LRM",
+            "amount": 1000
+        },
+        {
+            "id": 1,
+            "name": "LRM",
+            "amount": 1000
+        },
+        {
+            "id": "1",
+            "name": "LRM",
+            "amount": 1500.0
+        },
+        {
+            "id": "2",
+            "name": "Plazo Fijo",
+            "amount": 1500.0
+        }
+    ],
+    "456": [
+        {
+            "id": 2,
+            "name": "Plazo Fijo",
+            "amount": 500
+        }
+    ]
+}
