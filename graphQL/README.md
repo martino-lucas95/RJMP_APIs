@@ -21,7 +21,7 @@ Este proyecto es una API GraphQL para manejar las inversiones de los usuarios en
 
 3. Ejecutar la api
 ```bash
-python api_graphQL.py
+   python api_graphQL.py
 ```
 
 La aplicacion quedará disponible en: http://127.0.0.1:5000/graphql
@@ -84,5 +84,9 @@ mutation {
 }
 ```
 
+### Próximos pasos:
+- Agregar una Base de datos
+- "Vender" inversiones
+- Calcular ganancia por usuario
 
 
