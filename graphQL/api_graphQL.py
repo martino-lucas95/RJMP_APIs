@@ -60,6 +60,7 @@ mutation = MutationType()
 
 @query.field("possibleInvestments")
 def resolve_possible_investments(_, info):
+    possible_investments = load_json(POSSIBLE_INVESTMENTS_FILE)
     return possible_investments
 
 @query.field("userInvestments")
