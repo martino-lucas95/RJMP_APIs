@@ -1,7 +1,18 @@
 from flask import Flask, jsonify, request
 import json
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
 
 app = Flask(__name__)
+
+# Inicializar Flask-Limiter con la estrategia de IP
+limiter = Limiter(
+    get_remote_address,
+    app=app,
+    #strategy='fixed-window',  # Usar estrategia de ventana fija
+    #strategy='moving-window',
+    default_limits=["100 per day", "10 per minute"]  # Limite global
+)
 
 def load_json(file_path):
     try:
@@ -30,21 +41,25 @@ possible_investments = load_json(POSSIBLE_INVESTMENTS_FILE)
 user_investments = load_json(USER_INVESTMENTS_FILE)
 
 @app.route('/AndisBank')
+@limiter.limit("5 per minute")
 def home():
     return jsonify({"message": "Welcome"})
 
 @app.route('/AndisBank/investments/<account_id>', methods=['GET'])
+@limiter.limit("10 per second")
 def get_investments_by_account(account_id):
     investments = user_investments.get(account_id, [])
     return jsonify({"account_id": account_id, "investments": investments})
 
 
 @app.route('/AndisBank/investments', methods=['GET'])
+@limiter.limit("1 per second")
 def get_investments():
     return jsonify({"possible_investments": possible_investments})
 
 
 @app.route('/AndisBank/investments/<account_id>', methods=['POST'])
+@limiter.limit("10 per minute")
 def invest(account_id):
     data = request.json
     investment_id = data.get('investment_id')
