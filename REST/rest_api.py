@@ -2,8 +2,12 @@ from flask import Flask, jsonify, request
 import json
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
+from limits.strategies import STRATEGIES
+from token_bucket_strategy import TokenBucketRateLimiter
 
 app = Flask(__name__)
+
+STRATEGIES["token-bucket"] = TokenBucketRateLimiter
 
 # Inicializar Flask-Limiter con la estrategia de IP
 limiter = Limiter(
@@ -78,6 +82,26 @@ def invest(account_id):
         return jsonify({"message": f"Inversión realizada para la cuenta {account_id}!", "investment": new_investment}), 201
     else:
         return jsonify({"error": "Inversión no encontrada"}), 404
+
+@app.route('/AndisBank/fixed-window', methods=['GET'])
+@limiter.limit("5 per minute")
+def fixed_window():
+    return jsonify({"message": "Welcome"})
+
+limiter._strategy = 'moving-window'
+
+@app.route('/AndisBank/sliding-window', methods=['GET'])
+@limiter.limit("5 per second")
+def sliding_window():
+    return jsonify({"message": "Welcome"})
+
+
+limiter._strategy = 'token-bucket'
+
+@app.route('/AndisBank/token-bucket', methods=['GET'])
+@limiter.limit("5 per second")
+def token_bucket():
+    return jsonify({"message": "Welcome"})
 
 
 if __name__ == '__main__':
