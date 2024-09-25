@@ -2,6 +2,8 @@ from flask import Flask, jsonify, request
 import json
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
+import threading
+
 
 app = Flask(__name__)
 
@@ -40,6 +42,9 @@ USER_INVESTMENTS_FILE = "user_investments.json"
 possible_investments = load_json(POSSIBLE_INVESTMENTS_FILE)
 user_investments = load_json(USER_INVESTMENTS_FILE)
 
+
+
+
 @app.route('/AndisBank')
 @limiter.limit("5 per minute")
 def home():
@@ -51,11 +56,27 @@ def get_investments_by_account(account_id):
     investments = user_investments.get(account_id, [])
     return jsonify({"account_id": account_id, "investments": investments})
 
+# investments, fixed-window
+# @app.route('/AndisBank/investments', methods=['GET'])
+# @limiter.limit("1 per second")
+# def get_investments():
+#   return jsonify({"possible_investments": possible_investments})
 
+# Semáforo controla la concurrencia (por ejemplo, 2 concurrencias)
+concurrency_limit = threading.Semaphore(10)
+
+# investments, concurrency
 @app.route('/AndisBank/investments', methods=['GET'])
-@limiter.limit("1 per second")
 def get_investments():
-    return jsonify({"possible_investments": possible_investments})
+    # Intentar adquirir el semáforo, si no se puede, devolver un error.
+    if not concurrency_limit.acquire(blocking=False):
+        return jsonify({"error": "Too many concurrent requests, try again later."}), 429
+    
+    try:
+        return jsonify({"possible_investments": possible_investments})
+    finally:
+        # Liberar el semáforo
+        concurrency_limit.release()
 
 
 @app.route('/AndisBank/investments/<account_id>', methods=['POST'])
